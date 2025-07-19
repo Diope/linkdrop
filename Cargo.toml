@@ -11,6 +11,7 @@ serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 reqwest = { version = "0.11", features = ["blocking", "rustls-tls"] }
 scraper = "0.17"
+winit = "0.29"          # same major version Tauri 2 / wry uses
 
 [lib]
 crate-type = ["cdylib", "rlib"] 
