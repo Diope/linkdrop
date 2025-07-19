@@ -1,0 +1,16 @@
+[package]
+name = "tauri-plugin-linkdrop"
+version = "0.1.0"
+edition = "2021"
+license = "MIT OR Apache-2.0"
+description = "Tauri 2.x plugin to handle drag-and-drop of web links (URLs) and extract metadata."
+
+[dependencies]
+tauri = "2"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+reqwest = { version = "0.11", features = ["blocking", "rustls-tls"] }
+scraper = "0.17"
+
+[lib]
+crate-type = ["cdylib", "rlib"] 
