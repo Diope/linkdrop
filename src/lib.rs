@@ -1,11 +1,10 @@
 use std::{fs, path::{Path, PathBuf}};
-use tauri::{RunEvent, Manager, Runtime};
+use tauri::{RunEvent, Runtime, WindowEvent, DragDropEvent, Emitter};
 use tauri::plugin::{Builder as PluginBuilder, TauriPlugin};
-use winit::event::WindowEvent as WinitWindowEvent;
 
 use serde::Serialize;
 
-#[derive(Serialize)]
+#[derive(Serialize, Clone)]
 struct LinkMetadata {
     url: String,
     title: Option<String>,
@@ -18,17 +17,20 @@ pub fn init<R: Runtime>() -> TauriPlugin<R> {
     PluginBuilder::new("linkdrop")
         .on_event(|app_handle, event| {
             if let RunEvent::WindowEvent { event, .. } = event {
-                if let WinitWindowEvent::DroppedFile(path) = event {
-                    let path_buf = PathBuf::from(path.clone());
-                    let app = app_handle.clone();
-                    std::thread::spawn(move || {
-                        if let Some(meta) = handle_dropped_file(&path_buf) {
-                            let _ = app.emit_all("link-dropped", meta);
+                if let WindowEvent::DragDrop(file_event) = event {
+                    if let DragDropEvent::Drop { paths, .. } = file_event {
+                        if let Some(first_path) = paths.first() {
+                            let path_buf = first_path.clone();
+                            let app = app_handle.clone();
+                            std::thread::spawn(move || {
+                                if let Some(meta) = handle_dropped_file(&path_buf) {
+                                    let _ = app.emit("link-dropped", meta);
+                                }
+                            });
                         }
-                    });
+                    }
                 }
             }
-            Ok(())
         })
         .build()
 }
